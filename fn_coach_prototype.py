@@ -30,13 +30,15 @@ def update_locations_list():
 
 ### GUI ###
 
+sg.change_look_and_feel('DarkBlue')
+
 data_entry_layout = [
     [sg.Text('FNCoach')],
     [sg.Text('Where did you die?', size=(21,1)), sg.Combo(update_locations_list(), key='_DEATH_LOCATION_')],
     [sg.Text('What weapon did you die to?', size=(21,1)), sg.Combo(update_weapon_list(), key='_DEATH_WEAPON_')],
     [sg.Text('What placement did you get?', size=(21,1)), sg.Combo([i for i in range(1,101)][::-1],key='_PLACEMENT_')],
-    [sg.Text('Summarize your death.', size=(21,1)), sg.InputText(key='_DEATH_SUMMARY_')],
-    [sg.Text('How can you prevent this?', size=(21,1)), sg.InputText(key='_PREVENTION_')],
+    [sg.Text('Summarize your death.', size=(21,1)), sg.Multiline(key='_DEATH_SUMMARY_')],
+    [sg.Text('How can you prevent this?', size=(21,1)), sg.Multiline(key='_PREVENTION_')],
     [sg.Button('Submit'), sg.Button('ResetDB'), sg.Button('Cancel')]
 ]
 
@@ -64,6 +66,8 @@ while app_running:
         c.execute('DELETE FROM user_data')
         conn.commit()
     elif event == 'Cancel':
+        app_running = False
+    elif event == 'Exit':
         app_running = False
 
 conn.close()
