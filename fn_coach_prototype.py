@@ -28,6 +28,14 @@ def update_locations_list():
     set(locations)
     return locations
 
+### ANALYSIS ###
+
+def analyze_data(user_db):
+    import pandas as pd
+    user_data_df = pd.read_sql_query(f"SELECT * FROM {user_db}", conn)
+    print(user_data_df)
+
+
 ### GUI ###
 
 sg.change_look_and_feel('DarkBlue')
@@ -39,7 +47,7 @@ data_entry_layout = [
     [sg.Text('What placement did you get?', size=(21,1)), sg.Combo([i for i in range(1,101)][::-1],key='_PLACEMENT_')],
     [sg.Text('Summarize your death.', size=(21,1)), sg.Multiline(key='_DEATH_SUMMARY_')],
     [sg.Text('How can you prevent this?', size=(21,1)), sg.Multiline(key='_PREVENTION_')],
-    [sg.Button('Submit'), sg.Button('ResetDB'), sg.Button('Cancel')]
+    [sg.Button('Submit'), sg.Button('ResetDB'), sg.Button('Analyze'), sg.Button('Cancel')]
 ]
 
 layout = [[sg.Frame('Input', data_entry_layout)]]
@@ -65,6 +73,8 @@ while app_running:
     elif event == 'ResetDB':
         c.execute('DELETE FROM user_data')
         conn.commit()
+    elif event == 'Analyze':
+        analyze_data('user_data')
     elif event == 'Cancel':
         app_running = False
     elif event == 'Exit':
