@@ -1,5 +1,5 @@
 # fncoach_prototype
-## A smart note-taking app for Fortnite players looking to improve
+## A smart note-taking app for Fortnite players looking to improve.
 
 ## What is it?
 In its current state, fncoach doesn't do much. Here's what it currently does:
