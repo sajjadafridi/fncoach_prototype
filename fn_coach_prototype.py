@@ -2,6 +2,9 @@ import PySimpleGUI as sg
 import sqlite3
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+import pandas_profiling
+
 
 ### SCRAPING ###
 
@@ -16,7 +19,8 @@ def update_weapon_list():
         weapons.sort()
     return weapons
 
-def update_locations_list():
+
+def update_locations_list():  # TODO find a better way of scraping current locations instead of all
     locations_url = 'https://fortnite.fandom.com/wiki/Locations_(Battle_Royale)'
     locations_page = requests.get(locations_url)
     soup = BeautifulSoup(locations_page.content, 'html.parser')
@@ -30,15 +34,15 @@ def update_locations_list():
     locations.sort()
     return locations
 
+
 ### ANALYSIS ###
 
 def analyze_data(user_db):
-    import pandas as pd
     user_data_df = pd.read_sql_query(f"SELECT * FROM {user_db}", conn)
-    print(user_data_df)
+    print(user_data_df.profile_report()) # TODO fix memory error
+
 
 # TODO analzye the data in some kind of meaningful way when the player requests it
-
 
 ### GUI ###
 
@@ -46,12 +50,14 @@ sg.change_look_and_feel('DarkBlue')
 
 data_entry_layout = [
     [sg.Text('FNCoach')],
-    [sg.Text('Where did you die?', size=(21,1)), sg.Combo(update_locations_list(), key='_DEATH_LOCATION_')],
-    [sg.Text('What weapon did you die to?', size=(21,1)), sg.Combo(update_weapon_list(), key='_DEATH_WEAPON_')],
-    [sg.Text('What placement did you get?', size=(21,1)), sg.Combo([i for i in range(1,101)][::-1],key='_PLACEMENT_')],
+    [sg.Text('Where did you die?', size=(21, 1)), sg.Combo(update_locations_list(), key='_DEATH_LOCATION_')],
+    [sg.Text('What weapon did you die to?', size=(21, 1)), sg.Combo(update_weapon_list(), key='_DEATH_WEAPON_')],
+    # TODO add selector for mode (solos, duos, squads), update placement based on this
+    [sg.Text('What placement did you get?', size=(21, 1)),
+     sg.Combo([i for i in range(1, 101)][::-1], key='_PLACEMENT_')],
     [sg.Text('Try to keep your summary and prevention descriptions under 10 words.', font=('', 8))],
-    [sg.Text('Summarize your death.', size=(21,1)), sg.InputText(key='_DEATH_SUMMARY_')],
-    [sg.Text('How can you prevent this?', size=(21,1)), sg.InputText(key='_PREVENTION_')],
+    [sg.Text('Summarize your death.', size=(21, 1)), sg.InputText(key='_DEATH_SUMMARY_')],
+    [sg.Text('How can you prevent this?', size=(21, 1)), sg.InputText(key='_PREVENTION_')],
     [sg.Button('Submit'), sg.Button('ResetDB'), sg.Button('Analyze'), sg.Button('Cancel')]
 ]
 
