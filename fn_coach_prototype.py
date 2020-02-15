@@ -3,7 +3,8 @@ import sqlite3
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import pandas_profiling
+# import pandas_profiling
+import lxml.html
 
 
 ### SCRAPING ###
@@ -23,13 +24,9 @@ def update_weapon_list():
 def update_locations_list():  # TODO find a better way of scraping current locations instead of all
     locations_url = 'https://fortnite.fandom.com/wiki/Locations_(Battle_Royale)'
     locations_page = requests.get(locations_url)
-    soup = BeautifulSoup(locations_page.content, 'html.parser')
-    locations = []
-    for page_content in soup.find_all('div', class_='mw-content-ltr mw-content-text'):
-        for location_list_unordered in page_content.find_all('ul'):
-            for location_a in location_list_unordered.find_all('a'):
-                if location_a != None:
-                    locations.append(location_a.text)
+    doc = lxml.html.fromstring(locations_page.content)
+    locations = [p.attrib['title'] for p in doc.xpath('//*[@id="mw-content-text"]//ul//following-sibling::b')[0].xpath(
+    '//*[@title != "" and not(contains(@href, ":") or contains(@title, "-") ) and not(contains(@title, ":")) and not (@rel) and not (@data-tracking)]')]
     set(locations)
     locations.sort()
     return locations
